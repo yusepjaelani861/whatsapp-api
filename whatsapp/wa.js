@@ -1,4 +1,3 @@
-const qrcode = require('qrcode')
 const db1 = require('../connection/database');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const routeWA = require('express')();
@@ -15,7 +14,7 @@ const client = new Client({
     },
     authStrategy: new LocalAuth({
         restartOnAuthFail: true,
-        clientId: 'yusep2',
+        clientId: 'yusep',
     })
 })
 
@@ -50,10 +49,6 @@ client.on('message', message => {
     if (message.body === 'ping') {
         message.reply('pong');
     }
-})
-
-client.on('media_uploaded', (media) => {
-    console.log('media', media);
 })
 
 routeWA.get('/contacts', (req, res) => {
