@@ -1,11 +1,12 @@
 const mysql = require('mysql');
+const config = require('../config.json');
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'whatsapp-api'
-});
+    host: config.database.host,
+    user: config.database.user,
+    password: config.database.password,
+    database: config.database.database
+})
 
 connection.connect((err) => {
     if (err) throw err;
