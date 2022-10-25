@@ -6,6 +6,7 @@ const sha1 = require('sha1');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 var bodyParser = require('body-parser');
 const { body, validationResult } = require('express-validator');
+const { numberWAFormat, formatDate } = require('../helper/format');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -77,6 +78,33 @@ app.post('/create', [
 
     client.on('ready', async () => {
         console.log('Client is ready!');
+    })
+
+    client.on('message', message => {
+        let name;
+    
+        if (message.notifyName === undefined || message.notifyName === null) {
+            name = message.from;
+        } else {
+            name = message.notifyName;
+        }
+    
+        const queryCek = "SELECT * FROM `contacts` WHERE `chatId` = '" + message.from + "'";
+        db1.query(queryCek, function (err, result) {
+            if (err) throw err;
+            console.log('cek', result);
+            if (result.length === 0) {
+                const query = "INSERT INTO `contacts` (`chatId`, `name`, `phone`, `created_at`, `updated_at`) VALUES ('" + message.from + "', '" + name + "', '" + numberWAFormat(message.from) + "', '" + formatDate(new Date()) + "', '" + formatDate(new Date()) + "')";
+                db1.query(query, function (err, result) {
+                    if (err) throw err;
+                    console.log('insert', result);
+                })
+            }
+        })
+    
+        if (message.body === 'ping') {
+            message.reply('pong');
+        }
     })
 
     client.on('auth_failure', async () => {
